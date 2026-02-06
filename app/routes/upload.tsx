@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import FileUploader from "~/components/FileUploader";
 import Navbar from "~/components/Navbar";
 import { generateUUID } from "~/lib/fileUtils";
-import { convertPdfToImage } from "~/lib/pdf2img";
+import { convertPdfToImage } from "../lib/pdf2img";
 import { usePuterStore } from "~/lib/puter";
 
 
@@ -22,16 +22,17 @@ const Upload = () => {
 
     const handleAnalyze = async ({companyName, jobTitle, jobDescription, file } : {companyName: string, jobTitle: string, jobDescription: string, file: File}) => {
         setIsProcessing(true);
-        setStatusText("Uploading the file...");
-        const uploadedFile = await fs.upload([file])
+        setStatusText('Uploading the file...');
+        const uploadedFile = await fs.upload([file]);
+        if(!uploadedFile) return setStatusText('Error: Failed to upload file');
 
-        if(!uploadedFile) return setStatusText("Error: Failed to upload file. Please try again.");
-        setStatusText("Converting to image...")
+        setStatusText('Converting to image...');
         const imageFile = await convertPdfToImage(file);
-        if(!imageFile.file) return setStatusText("Error: Failed to convert PDF to image. Please try again.");
-        setStatusText("Uploading the image...");
+        if(!imageFile.file) return setStatusText('Error: Failed to convert PDF to image');
+
+        setStatusText('Uploading the image...');
         const uploadedImage = await fs.upload([imageFile.file]);
-        if(!uploadedImage) return setStatusText("Error: Failed to upload image. Please try again.");
+        if(!uploadedImage) return setStatusText('Error: Failed to upload image');
         setStatusText("Preparing data...");
 
         const uuid = generateUUID();
@@ -60,6 +61,7 @@ const Upload = () => {
          data.feedback = JSON.parse(feedbackText);
          await kv.set(`resume:${uuid}`, JSON.stringify(data));
          setStatusText("Analysis complete! Redirecting to home page...");
+         navigate(`/resume/${uuid}`);
 
     }
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
