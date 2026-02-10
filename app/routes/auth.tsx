@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from "react-router";
 import { usePuterStore } from "~/lib/puter";
 
 export const meta = () => [
-  { title: "Resumind | Auth" },
-  { name: "description", content: "Log into your Resumind account." },
+  { title: "Skillzy | Auth" },
+  { name: "description", content: "Log into your Skillzy account." },
 ];
 
 const Auth = () => {
